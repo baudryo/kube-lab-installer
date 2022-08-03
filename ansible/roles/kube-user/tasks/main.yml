@@ -39,6 +39,32 @@
     group: root
     mode: '0644'
 
+- name: Clone kubectx repository
+  git:
+    repo: https://github.com/ahmetb/kubectx
+    dest: /usr/local/kubectx
+
+- name: Create a symbolic link for kubectx and kubens
+  file:
+    src: /usr/local/kubectx/{{ item }}
+    dest: /usr/local/bin/{{ item }}
+    owner: root
+    group: root
+    state: link
+  loop:
+    - kubectx
+    - kubens
+
+- name: Add alias and enable autocompletion fro kubectl
+  lineinfile:
+      dest: /home/{{ kube_user }}/.bashrc
+      line: "source <(kubectl completion bash) \nalias k=kubectl \ncomplete -o default -F __start_kubectl k"
+
+
+    ############ get kubeconfig locally
+
+
+
 #- name: Create /home/{{ lookup('env','USER') }}/.kube/ if not exist (on localhost)
   #file:
     #path: /home/{{ lookup('env','USER') }}/.kube/ 
