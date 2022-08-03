@@ -1,0 +1,60 @@
+---
+
+- name: Create user {{ kube_user }}
+  user:
+    name: "{{ kube_user }}"
+    shell: /bin/bash
+
+- name: Create directory /home/{{ kube_user }}/.kube
+  file:
+    path: /home/{{ kube_user }}/.kube
+    state: directory
+    owner: "{{ kube_user }}"
+    group: "{{ kube_user }}"
+    mode: '0755'
+
+- name: Create directory /root/.kube
+  file:
+    path: /root/.kube
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Copy /etc/kubernetes/admin.conf to /home/{{ kube_user }}/.kube/config
+  copy:
+    remote_src: yes
+    src: /etc/kubernetes/admin.conf 
+    dest: /home/{{ kube_user }}/.kube/config
+    owner: "{{ kube_user }}"
+    group: "{{ kube_user }}"
+    mode: '0644'
+
+- name: Copy /etc/kubernetes/admin.conf to /root/.kube/config
+  copy:
+    remote_src: yes
+    src: /etc/kubernetes/admin.conf 
+    dest: /root/.kube/config
+    owner: root
+    group: root
+    mode: '0644'
+
+#- name: Create /home/{{ lookup('env','USER') }}/.kube/ if not exist (on localhost)
+  #file:
+    #path: /home/{{ lookup('env','USER') }}/.kube/ 
+    #state: directory
+  #delegate_to: localhost
+
+#- name: Save /home/{{ lookup('env','USER') }}/.kube/config
+  #copy:
+    #src: /home/{{ lookup('env','USER') }}/.kube/config
+    #dest: /home/{{ lookup('env','USER') }}/.kube/config-save
+  #delegate_to: localhost
+
+#- name: Copy /etc/kubernetes/admin.conf locally
+  #fetch:
+    #src: /etc/kubernetes/admin.conf
+    #dest: /home/{{ lookup('env','USER') }}/.kube/config
+
+
+

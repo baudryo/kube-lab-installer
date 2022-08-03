@@ -1,0 +1,18 @@
+---
+
+- name: Kubeadm join worker
+  shell: |
+    kubeadm join {{ hostvars['master_kubeadm_init']['master_init_ip'] }}:6443 --token {{ hostvars['master_kubeadm_init']['kubeadm_join_token'] }} \ 
+                                                                              --discovery-token-ca-cert-hash {{ hostvars['master_kubeadm_init']['kubeadm_join_hash'] }} \
+  when: "'worker' in group_names"
+
+- name: Kubeadm join master
+  shell: |
+    kubeadm join {{ hostvars['master_kubeadm_init']['master_init_ip'] }}:6443 --token {{ hostvars['master_kubeadm_init']['kubeadm_join_token'] }} \ 
+                                                                              --discovery-token-ca-cert-hash {{ hostvars['master_kubeadm_init']['kubeadm_join_hash'] }} \
+                                                                              --control-plane
+
+  when: "'master' in group_names"
+
+
+

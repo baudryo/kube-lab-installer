@@ -1,0 +1,19 @@
+container_runtime: "containerd"
+container_runtime_version: "1.6.6-1"
+kubernetes_version: "1.23.0"
+pod_network_cidr: "192.168.0.0/16"
+
+packages:
+  - "python3-pip"
+  - "kubelet={{ kubernetes_version }}-00"
+  - "kubeadm={{ kubernetes_version }}-00"
+  - "kubectl={{ kubernetes_version }}-00"
+  - "{{ container_runtime }}.io={{ container_runtime_version }}"
+
+kernel_module:
+  - br_netfilter
+  - overlay
+
+kube_user: "vagrant"
+pod_network_manifest: "https://docs.projectcalico.org/manifests/calico.yaml"
+node_dns: "208.67.220.220" # OpenDNS Wikipedia

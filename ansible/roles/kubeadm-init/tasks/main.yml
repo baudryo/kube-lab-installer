@@ -1,0 +1,48 @@
+---
+
+- name: Set master_init_ip var
+  set_fact:
+    master_init_ip: "{{ hostvars[inventory_hostname]['ansible_eth1']['ipv4']['address'] }}"
+
+- name: Pull images for kubernetes v{{ kubernetes_version }}
+  shell: |
+    kubeadm config images pull --cri-socket /run/{{ container_runtime}}/{{ container_runtime }}.sock \
+                               --kubernetes-version=v{{ kubernetes_version }}
+
+- name: Init kubeadm on {{inventory_hostname }}
+  shell: |
+    kubeadm init --apiserver-advertise-address={{ master_init_ip }} \
+                 --control-plane-endpoint={{ master_init_ip }} \
+                 --pod-network-cidr={{ pod_network_cidr }} \
+                 --cri-socket /run/{{container_runtime }}/{{ container_runtime }}.sock \
+                 --kubernetes-version=v{{ kubernetes_version }} \
+                 --node-name {{ inventory_hostname }}
+
+- name: Generate token for kubeadm join
+  shell: |
+    kubeadm token create --print-join-command
+  register: tmp
+
+- name: Get token
+  set_fact:
+    token: "{{ tmp.stdout | regex_search(regexp, '\\2') | first }}"
+  vars:
+    regexp: '([^\s]+\s){4}([^\s]+)'
+
+- name: Get hash
+  set_fact:
+    hash: "{{ tmp.stdout | regex_search(regexp, '\\2') | first }}"
+  vars:
+    regexp: '([^\s]+\s){6}([^\s]+)'
+
+- name: Set variable for token / hash / master_init_ip
+  add_host:
+    name: master_kubeadm_init
+    master_init_ip: "{{ master_init_ip }}"
+    kubeadm_join_hash: "{{ hash }}"
+    kubeadm_join_token: "{{ token }}"
+
+
+
+
+
