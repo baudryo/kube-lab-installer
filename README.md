@@ -27,6 +27,7 @@ $ ./start.sh
 - copy kubeconfig on localhost
 - check if kube is already install
 - ansible lint
+- update README.md for all roles
 
 - new roles : 	
 	- update to new version of kubernetes
