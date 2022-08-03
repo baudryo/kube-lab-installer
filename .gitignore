@@ -1,1 +1,4 @@
 ansible/vagrant-ssh-config
+ansible/.ansible
+.vagrant
+
